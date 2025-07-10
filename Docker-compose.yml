@@ -1,5 +1,3 @@
-version: "3.9"
-
 # bandit:
 services:
   bandit:
@@ -16,17 +14,24 @@ services:
   gitleaks:
     image: zricethezav/gitleaks:latest
     container_name: gitleaks_git_scanner
+    working_dir: /work
+    volumes:
+      - ./reports:/output
     entrypoint:
-      - gitleaks
-      - detect
-      - --source=https://github.com/LuizHenriqueMB/challenge.git
-      - --report-format=json
-      - --report-path=gitleaks-report.json
-  
+      - /bin/sh
+      - -c
+      - |
+        git clone https://github.com/LuizHenriqueMB/challenge.git /repo && \
+        gitleaks detect --no-git --source=/repo --report-format=json --report-path=/output/gitleaks-report.json
+    # MELHORIA: Utilização de script no entrypoint para clonar dinamicamente o repositório.
+    # Isso permite que o Gitleaks opere de forma independente, sem depender de volumes locais,
+    # facilitando a execução em ambientes automatizados (CI/CD). 
+    # Como alternativa, seria possível mapear o diretório ./src via volume, mas isso exigiria pré-download do código.
+
   # trivy:
   trivy:
     image: aquasec/trivy:latest
     volumes:
-      - ./:/app
+      - ./reports:/reports # Diretório onde o Trivy salva o relatório
       - /var/run/docker.sock:/var/run/docker.sock
-    entrypoint: ["trivy"]
+    entrypoint: [] # Deixado vazio para passar o comando pelo Makefile
