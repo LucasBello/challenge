@@ -21,7 +21,7 @@ services:
       - /bin/sh
       - -c
       - |
-        git clone https://github.com/LuizHenriqueMB/challenge.git /repo && \
+        git clone https://github.com/LucasBello/challenge.git /repo && \
         gitleaks detect --no-git --source=/repo --report-format=json --report-path=/output/gitleaks-report.json
     # MELHORIA: Utilização de script no entrypoint para clonar dinamicamente o repositório.
     # Isso permite que o Gitleaks opere de forma independente, sem depender de volumes locais,
